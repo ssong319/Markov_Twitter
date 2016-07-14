@@ -53,6 +53,10 @@ def make_text(chains):
         # it would run for a very long time.
 
         word = choice(chains[key])
+
+        if len(" ".join(words) + word) >= 140:
+            break
+
         words.append(word)
         key = (key[1], word)
 
@@ -63,6 +67,19 @@ def tweet(chains):
     # Use Python os.environ to get at environmental variables
     # Note: you must run `source secrets.sh` before running this file
     # to make sure these environmental variables are set.
+
+    api = twitter.Api(consumer_key=os.environ['TWITTER_CONSUMER_KEY'],
+                      consumer_secret=os.environ['TWITTER_CONSUMER_SECRET'],
+                      access_token_key=os.environ['TWITTER_ACCESS_TOKEN_KEY'],
+                      access_token_secret=os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
+
+    # Prints info about credentials to make sure they're correct.
+    print(api.VerifyCredentials())
+
+    # Send a tweet.
+    status = api.PostUpdate(new_text)
+    print status.text
+
     pass
 
 # Get the filenames from the user through a command line prompt, ex:
@@ -74,6 +91,10 @@ text = open_and_read_file(filenames)
 
 # Get a Markov chain
 chains = make_chains(text)
+new_text = make_text(chains)
+print new_text
+print len(new_text)
+# print chains
 
 # Your task is to write a new function tweet, that will take chains as input
-# tweet(chains)
+tweet(chains)
